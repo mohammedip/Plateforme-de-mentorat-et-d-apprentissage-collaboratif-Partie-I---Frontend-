@@ -1,8 +1,10 @@
+import Stats from "./Stats";
+
 export default function Home(){
 
     return (
-        <>
-           <h1 className="title">Home</h1> 
-        </>
+        <div className="p-4">
+        <Stats />
+      </div>
     )
 }

@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
-import { fetchTags } from '../../services/api';
+import { tag } from '../../services/api';
 import TagCard from './TagCard';
 
 export default function TagList() {
   const [Tags, setTags] = useState([]);
 
   useEffect(() => {
-    fetchTags()
-      .then((data) => setTags(data))
-      .catch((error) => console.error('Erreur API :', error));
+    const getTags = async () => {
+      try {
+        const response = await tag.getTags();
+        setTags(response.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTags();
   }, []);
 
   return (

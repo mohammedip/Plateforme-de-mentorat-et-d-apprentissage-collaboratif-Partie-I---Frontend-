@@ -1,18 +1,38 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const api = axios.create({
+  baseURL: "http://127.0.0.1:8000/api",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
 
-export const fetchCategories = async () => {
-  const response = await axios.get(`${API_BASE_URL}/categories`);
-  return response.data.data;
+export default api;
+
+export const category = {
+  getCategories: () => api.get(`/v1/categories`),
+  getCategory: (id) => api.get(`/v1/categories/${id}`),
+  createCategory: (data) => api.post(`/v1/categories`, data),
+  updateCategory: (id, data) => api.put(`/v1/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/v1/categories/${id}`),
 };
 
-export const fetchTags = async () => {
-    const response = await axios.get(`${API_BASE_URL}/tags`);
-    return response.data.data;
-  };
+export const course = {
+  getCourses: () => api.get(`/v1/courses`),
+  getCourse: (id) => api.get(`/v1/courses/${id}`),
+  createCourse: (data) => api.post(`/v1/courses`, data),
+  updateCourse: (id, data) => api.put(`/v1/courses/${id}`, data),
+  deleteCourse: (id) => api.delete(`/v1/courses/${id}`),
+};
 
-export const fetchCourses = async () => {
-    const response = await axios.get(`${API_BASE_URL}/courses`);
-    return response.data.data;
-  };
+export const tag = {
+  getTags: () => api.get(`/v1/tags`),
+  gettag: (id) => api.get(`/v1/tags/${id}`),
+};
+
+export const statistique = {
+  getCoursesStat: () => api.get(`/v2/stats/courses`),
+  getCategoriesStat: () => api.get(`/v2/stats/categories`),
+  getTagsStat: () => api.get(`/v2/stats/tags`),
+};
