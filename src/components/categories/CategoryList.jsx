@@ -6,6 +6,8 @@ import CategoryForm from "./CategoryForm";
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+
 
   useEffect(() => {
     const getCategories = async () => {
@@ -13,33 +15,56 @@ export default function CategoryList() {
         const response = await category.getCategories();
         setCategories(response.data.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     getCategories();
   }, []);
 
-  const onEditCategory = (category) => {
-    
-    setIsModalOpen(true);
 
+  const onEditCategory = async (categoryId) => {
     try {
-
+      const response = await category.getCategory(categoryId);
+      setEditingCategory(response.data.data);
+      setIsModalOpen(true);
     } catch (error) {
-      
+      console.error("Error fetching category:", error);
     }
   };
 
-  const onDeleteCategory = (categoryId) => {
 
+  const onDeleteCategory = async (categoryId) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+
+    try {
+      await category.deleteCategory(categoryId);
+      setCategories((prev) => prev.filter((cat) => cat.id !== categoryId));
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
   };
 
+
   const openModal = () => {
+    setEditingCategory(null); 
     setIsModalOpen(true);
   };
 
+
   const closeModal = () => {
     setIsModalOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleSuccess = (newCategory, isEdit) => {
+    if (isEdit) {
+      setCategories((prev) =>
+        prev.map((cat) => (cat.id === newCategory.id ? newCategory : cat))
+      );
+    } else {
+      setCategories((prev) => [...prev, newCategory]);
+    }
+    closeModal();
   };
 
   return (
@@ -48,9 +73,9 @@ export default function CategoryList() {
         Categories
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {categories.map((category, index) => (
+        {categories.map((category) => (
           <CategoryCard
-            key={index}
+            key={category.id}
             category={category}
             onEditCategory={() => onEditCategory(category.id)}
             onDeleteCategory={() => onDeleteCategory(category.id)}
@@ -71,7 +96,11 @@ export default function CategoryList() {
           style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96">
-            <CategoryForm closeModal={closeModal} />
+            <CategoryForm
+              closeModal={closeModal}
+              category={editingCategory}
+              onSuccess={handleSuccess}
+            />
           </div>
         </div>
       )}
